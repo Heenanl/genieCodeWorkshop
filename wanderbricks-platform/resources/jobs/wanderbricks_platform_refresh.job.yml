@@ -1,0 +1,17 @@
+# Orchestrates the WanderBricks platform refresh. Later vibe-session steps
+# (metric views, data dictionary, handbook indexing) are added as downstream tasks.
+resources:
+  jobs:
+    wanderbricks_platform_refresh:
+      name: wanderbricks_platform_refresh
+      description: "Daily refresh of the WanderBricks medallion pipeline (bronze -> silver -> gold)."
+      tasks:
+        - task_key: refresh_medallion_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.wanderbricks_medallion.id}
+            full_refresh: false
+      schedule:
+        # Dev mode pauses this automatically.
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: UTC
+      max_concurrent_runs: 1

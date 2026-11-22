@@ -1,0 +1,25 @@
+# Medallion schemas for the WanderBricks Intelligence Platform.
+# Other resources must reference these via ${resources.schemas.<key>.name}
+# (never raw variables) so deployment ordering is guaranteed.
+resources:
+  schemas:
+    wanderbricks_bronze:
+      catalog_name: ${var.catalog}
+      name: ${var.schema_prefix}_bronze
+      comment: >-
+        Raw WanderBricks vacation-rental data copied 1:1 from samples.wanderbricks (16 tables).
+        No business logic applied. Also hosts the reference_docs volume (analytics handbook).
+
+    wanderbricks_silver:
+      catalog_name: ${var.catalog}
+      name: ${var.schema_prefix}_silver
+      comment: >-
+        Cleaned, typed and conformed WanderBricks entities (bookings, properties, reviews,
+        support messages flattened from nested arrays). Data quality expectations enforced.
+
+    wanderbricks_gold:
+      catalog_name: ${var.catalog}
+      name: ${var.schema_prefix}_gold
+      comment: >-
+        Business-ready analytics tables for the WanderBricks platform: revenue, occupancy,
+        guest satisfaction and host performance. Source for metric views, Genie agents and apps.

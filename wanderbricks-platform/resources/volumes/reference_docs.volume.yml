@@ -1,0 +1,10 @@
+# Volume for unstructured reference material used by the Genie Code flywheel
+# (e.g. wanderbricks-analytics-handbook PDF -> chunk -> Vector Search -> lookup_business_definition()).
+resources:
+  volumes:
+    reference_docs:
+      catalog_name: ${resources.schemas.wanderbricks_bronze.catalog_name}
+      schema_name: ${resources.schemas.wanderbricks_bronze.name}
+      name: reference_docs
+      volume_type: MANAGED
+      comment: "Reference documents for WanderBricks (analytics handbook, business definitions)."

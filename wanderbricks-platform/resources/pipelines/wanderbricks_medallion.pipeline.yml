@@ -1,0 +1,31 @@
+# Bronze -> silver -> gold Spark Declarative Pipeline over samples.wanderbricks.
+# Default publishing schema is bronze; silver/gold datasets use fully qualified names
+# built from the configuration values below.
+resources:
+  pipelines:
+    wanderbricks_medallion:
+      name: wanderbricks_medallion
+      catalog: ${resources.schemas.wanderbricks_bronze.catalog_name}
+      schema: ${resources.schemas.wanderbricks_bronze.name}
+      serverless: true
+      photon: true
+      channel: current
+      continuous: false
+      root_path: ../../src/pipelines/wanderbricks_medallion
+      libraries:
+        - glob:
+            include: ../../src/pipelines/wanderbricks_medallion/transformations/**
+      configuration:
+        source_catalog: ${var.source_catalog}
+        source_schema: ${var.source_schema}
+        bronze_schema: ${resources.schemas.wanderbricks_bronze.name}
+        silver_schema: ${resources.schemas.wanderbricks_silver.name}
+        gold_schema: ${resources.schemas.wanderbricks_gold.name}
+        # Metadata-driven bronze layer: add a table here to ingest it.
+        bronze_tables: >-
+          amenities,booking_updates,bookings,clickstream,countries,customer_support_logs,
+          destinations,employees,hosts,page_views,payments,properties,property_amenities,
+          property_images,reviews,users
+      permissions:
+        - level: CAN_VIEW
+          group_name: users
