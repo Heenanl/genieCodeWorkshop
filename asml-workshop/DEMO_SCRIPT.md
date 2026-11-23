@@ -36,7 +36,7 @@ To keep to time: every prompt is **pre-run**. Keep a second tab with the finishe
 - No `/Users/<you>/.assistant_instructions.md`.
 - No demo skills in `/Users/<you>/.assistant/skills/`.
 - No saved memories about WanderBricks.
-- **The demo user has no `READ VOLUME` on the `skills.data_services.*` skills.** The team skills from GitLab must stay invisible until 2c (see the reset steps).
+- **The UC skills are switched off in Genie Code > Customizations.** The team skills from GitLab must stay invisible until 2c (see the reset steps).
 - No `WanderBricks Reviews` server in Genie Code **Settings > MCP Servers**.
 - Work from a notebook in `asml-workshop/demo/`.
 
@@ -128,19 +128,21 @@ merge request + CI validation                  (runs inside the workspace,      
 - A pre-run tab of the Job run that shows `updated: skills.data_services.de-job-standards`.
 
 **Do first (10 s): retire the personal copy.** Delete `/Users/<you>/.assistant/skills/job-standards/`. Keep `table-governance/` and `pii-management/`.
-**Say:** "The team standard replaces my personal copy. There's no precedence order between skill sources, and Genie Code picks skills by relevance, so keep **one** source per standard."
+**Say:** "The team standard replaces my personal copy. There's no precedence order between skill sources, and Genie Code picks skills by relevance, so keep **one** source per standard. Our instructions already say: team skill when available, otherwise the personal one."
 
 **Show (60 s): the governance path.**
 1. **GitLab:** the repo layout (`skills/<name>/SKILL.md`, `skills.yaml` maps each folder to a UC name). Then open the MR. The **`validate_skills` pipeline** checks names and frontmatter before anything can merge. **Merge it.**
 2. **Databricks:** **Jobs > skills-sync-uc > Run now**. While it runs: "This Job pulls from GitLab: the workspace fetches the repo, so nothing in GitLab needs a Databricks credential or network access into the workspace. It runs as a service principal, so a person's login never publishes the team standard." Switch to the pre-run tab: `updated: …de-job-standards`, and the other three skills `unchanged`.
 3. **Catalog Explorer > skills > data_services:** the 4 skills as Unity Catalog securables, with an owner, permissions, and a full audit trail.
 
-**Do live (30 s): access is a GRANT.**
+**Show (15 s): who *may* use them is a UC grant.** Catalog Explorer > `skills` > **Permissions**: `READ VOLUME` (plus `USE CATALOG` / `USE SCHEMA`) to a group, here `account users`. "Restrict a standard to one team by granting it to that team's group only."
 ```sql
-GRANT USE CATALOG ON CATALOG skills TO `<demo-group>`;
-GRANT USE SCHEMA  ON SCHEMA  skills.data_services TO `<demo-group>`;
-GRANT READ VOLUME ON SKILL   skills.data_services.`de-job-standards` TO `<demo-group>`;   -- repeat per skill, or use Catalog Explorer > Permissions
+GRANT USE CATALOG ON CATALOG skills TO `<group>`;
+GRANT USE SCHEMA  ON SCHEMA  skills.data_services TO `<group>`;
+GRANT READ VOLUME ON CATALOG skills TO `<group>`;   -- or per skill in Catalog Explorer > Permissions
 ```
+
+**Do live (15 s): switch them on.** Genie Code > **Customizations** > **Skills**: enable the Unity Catalog skills (`de-job-standards`, `uc-documentation`, `data-quality-checks`, `code-review-checklist`). "UC decides who *may* use a skill; each engineer opts in."
 
 **New chat, Prompt 2c:**
 
@@ -245,7 +247,7 @@ Run Prompt 2b-1 in a terminal with the Genie Code CLI. Note that the CLI has its
 | --- | --- |
 | A live run is slow | Switch to the pre-run tab and narrate the reasoning panel |
 | A skill doesn't auto-load | `@job-standards` explicitly; check you started a new chat |
-| UC skill doesn't load in 2c | New chat? Preview on? `READ VOLUME` granted to the group you're in? Then `@de-job-standards` explicitly |
+| UC skill doesn't load in 2c | Switched on in Genie Code > Customizations? New chat (hard-refresh the tab if the list looks stale)? Preview on? `READ VOLUME` for your group? Then `@de-job-standards` explicitly |
 | `skills-sync-uc` run is slow or fails | Show the pre-run successful run (`updated: …`); usual causes: the GitLab access token on the service principal expired, or the MR isn't merged yet |
 | Genie Agent not offered in Add Server, or the call fails | Check the demo user has access to the agent and its tables; otherwise show the pre-run tab and move on |
 | Memory not recalled | Show the saved memory entry, then say "recall is relevance-based, unlike instructions" |
@@ -258,12 +260,14 @@ Run Prompt 2b-1 in a terminal with the Genie Code CLI. Note that the CLI has its
 4. Delete the WanderBricks memory (ask Genie Code to forget it)
 5. Delete the demo jobs created by Genie Code (Jobs UI, filter by tag `project:asml_demo`). **Not** `skills-sync-uc`.
 6. Remove **WanderBricks Reviews** from Genie Code Settings -> MCP Servers so the live "Add Server" step works again (keep the Genie Agent itself)
-7. **Revoke the 2c grants** so the team skills are invisible again: `REVOKE READ VOLUME ON SKILL skills.data_services.<skill> FROM <demo-group>` (per skill), plus the schema/catalog grants
+7. **Switch the UC skills off again** in Genie Code > Customizations so the live step in 2c works again (keep the UC grants)
+   7b. **Re-create the personal `job-standards`** in `/Users/<you>/.assistant/skills/` for 2b (folder `job-standards`, file `SKILL.md`)
 8. **Re-stage the 2c MR:** revert the merged change on `main` (Revert button on the MR), **Run now** on `skills-sync-uc`, then open a fresh MR with the same change
 
 ## Pre-run checks (delete this section before sharing)
 
-- [ ] You can GRANT/REVOKE `READ VOLUME` on the skills (they're owned by the service principal `gitlab-skills-publisher`); confirm the exact `GRANT … ON SKILL` syntax, or use Catalog Explorer > Permissions
-- [ ] The team skills are really invisible before 2c. If they show up because you own the `skills` catalog, rehearse 2c with a separate demo user or group
+- [ ] UC skills switched off in Customizations really disappears from "list your skills" in a new chat, and switching on brings them back
+- [ ] In a new chat after 2c, "list your skills" shows `de-job-standards` and no `job-standards` (the instructions now say: team skill when available, otherwise the personal one)
+- [ ] The 2b skill folder is `job-standards/SKILL.md` (hyphen, uppercase file name). `job_standards/skill.md` doesn't load
 - [ ] Time one `skills-sync-uc` run (serverless startup), and keep the pre-run tab ready
 - [ ] Your 2b `job-standards` user skill uses the same conventions as the UC `de-job-standards`: `gold_` prefix, snake_case job names, `audit_timestamp` / `source_system` last, `project` tag

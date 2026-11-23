@@ -19,10 +19,15 @@
 - Tables `lowercase_snake_case` with `bronze_` / `silver_` / `gold_` prefixes.
 - `audit_timestamp` and `source_system` are the LAST two columns of every table.
 
-## Skills (Approach A: skills in the workspace)
-1. `@table-governance`: apply first, to every table
-2. `@job-standards`: notebooks, Delta writes, job settings
-3. `@pii-management`: tables with personal data
+## Skills
+Team standards live in the GitLab skills repo, are reviewed in merge requests, published to
+Unity Catalog (`skills.data_services`) and enabled in Genie Code > Customizations. Keep **one
+source per standard**; there is no precedence order between skill sources.
 
-## Skills (Approach B: skills served from GitLab/GitHub via MCP)
-Before writing table or job code, fetch each required `skills/<name>/SKILL.md` with the `get_file_contents` tool on the MCP connection `<your-connection>` (owner `<org>`, repo `<repo>`, branch `main`). If the fetch fails, stop and report it; don't fall back to local skills. Remove local `.assistant/skills/` copies when using this approach, because local skills take precedence.
+1. `@table-governance`: apply first, to every table. It implements the documentation policy
+   above; where `uc-documentation` differs, this policy wins.
+2. `@de-job-standards` (UC): notebooks, job structure and job settings. If it isn't available,
+   use `@job-standards`. Never apply both.
+3. `@data-quality-checks` (UC): before publishing a table or scheduling a job.
+4. `@pii-management`: tables with personal data.
+5. `@code-review-checklist` (UC): before a merge request, or when asked "is this production ready".

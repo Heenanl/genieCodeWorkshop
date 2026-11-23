@@ -11,6 +11,7 @@
 | AGENTS.md / CLAUDE.md | Any folder in your project (auto-discovered up the tree) | Reuse the files your Claude/Copilot teams already have |
 | Skills (user) | `/Users/<you>/.assistant/skills/<name>/SKILL.md` | Copy `skills/job-standards`, change the job settings to your team's |
 | Skills (workspace) | `/Workspace/.assistant/skills/<name>/SKILL.md` | Team standards, owned by admins |
+| Skills (Unity Catalog, Beta) | `<catalog>.<schema>.<skill>`, enabled in Genie Code > Customizations | Team standards published from GitLab; access is a UC grant |
 | MCP | Genie Code > Customizations > Connectors | Add a Genie Agent over your tables, or an external MCP (GitLab) |
 | Memory | Just say "Remember that ..." | Business rules such as "TST- machines are test rigs, exclude them" |
 | Project memory | `AGENTS.md` + `docs/project_context.md` in your Git folder | Copy `project/` and fill in your owners, SLAs, metrics |
@@ -19,9 +20,20 @@ Gotchas: start a **new chat** after editing a skill or instructions. A skill's `
 
 ## 2. Skills from your GitLab AI marketplace
 
-* Clone the skills repo as a Git folder and sync its skill folders into `.assistant/skills/`.
-* Or serve them through a Unity Catalog HTTP connection exposed as MCP, which is the [genie-code-skills-demo](https://github.com/databricks-solutions/genie-code-skills-demo) pattern (see its `mcp/README.md`). Local skills take precedence over MCP-served skills, so remove the local copies when you use MCP.
-* UC skills: [create and share UC skills](https://learn.microsoft.com/en-us/azure/databricks/agents/uc-skills/create-share-uc-skills/).
+What we showed (segment 2c): **GitLab stays the source of truth, Unity Catalog governs, Genie Code consumes.**
+
+1. Skills live in a GitLab repo: `skills/<name>/SKILL.md`, plus `skills.yaml` mapping each folder to `<catalog>.<schema>.<skill>`.
+2. GitLab CI validates every merge request (folder name = `name:`, description present, publisher dry run).
+3. A Databricks Job (Git source = the GitLab repo, run as a service principal, scheduled or Run now) runs the
+   [unity-gateway `publish-skills`](https://github.com/databricks/unity-gateway/tree/main/actions/publish-skills) publisher.
+   It creates, updates or skips each UC skill. The workspace pulls from GitLab, so workspace IP access lists don't get in the way.
+4. Grant `USE CATALOG`, `USE SCHEMA`, `READ VOLUME` to the teams that should use them; each user enables them in **Genie Code > Customizations**.
+
+Gotchas:
+* **Storage:** the skills schema needs a `MANAGED LOCATION` on your own storage. Databricks Default Storage fails with `NotImplemented`.
+* **One source per standard:** there's no precedence between user, workspace and UC skills; Genie Code picks by relevance. Don't keep a personal copy of a team skill.
+* **Beta:** UC skills in Genie Code are a preview (**Settings > Previews > Unity Gateway skills in Genie**). Workspace skills (`/Workspace/.assistant/skills/`) are the GA alternative, fed from the same GitLab repo.
+* Docs: [create and share UC skills](https://learn.microsoft.com/en-us/azure/databricks/agents/uc-skills/create-share-uc-skills/).
 
 ## 3. Five best practices
 

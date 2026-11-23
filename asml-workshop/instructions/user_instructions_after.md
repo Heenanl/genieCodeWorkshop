@@ -16,4 +16,6 @@ Copy into `/Users/<you>/.assistant_instructions.md` for segment 2a. Keep it shor
 - Every table gets a table COMMENT and column COMMENTs for keys, derived columns and PII columns in Unity Catalog.
 
 ## Skills
-- When writing tables or jobs, apply `job-standards` and `table-governance`. Add `pii-management` for personal data.
+- Tables: apply `table-governance`; add `pii-management` for personal data.
+- Notebooks and jobs: apply the team skill `de-job-standards` (Unity Catalog, published from GitLab) when it's available; otherwise my personal `job-standards`. Never apply both.
+- Before scheduling a job, run `data-quality-checks` when it's available.
