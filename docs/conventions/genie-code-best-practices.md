@@ -1,4 +1,4 @@
-# Genie Code Best Practices & Conventions
+`[](![url](path))`# Genie Code Best Practices & Conventions
 
 > These conventions have been developed through extensive production use of Genie Code across multiple Databricks projects. They represent patterns that maximize Genie Code's effectiveness by providing consistent context, reducing re-explanation, and enabling long-term project continuity.
 
