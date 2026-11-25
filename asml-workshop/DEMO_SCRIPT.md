@@ -1,30 +1,30 @@
-# Demo Script: ASML Genie Code Hackathon (max 20 min)
+# Demo Script: ASML Genie Code Hackathon (18 min + 2 min buffer)
 
-One storyline: **WanderBricks guest reviews -> daily property-health Job**, on `samples.wanderbricks`.
+One storyline: **WanderBricks bookings -> daily booking-revenue Job**, on `samples.wanderbricks`.
 Output lands in `genie_code_workshop.asml_demo` (run `setup/00_setup_and_reset.sql` first).
 
-ASML mapping to say out loud once: *property = machine, review = sensor reading, rating = health KPI, soft-deleted review = test rig.*
+ASML mapping to say out loud once: *property = machine, booking = production run, booking revenue = output KPI, cancelled booking = aborted run.*
 
 To keep to time: every prompt is **pre-run**. Keep a second tab with the finished result for each segment. Show the **job definition**; don't wait for a job run.
 
-| # | Segment | Min |
-|---|---|---|
-| 0 | Framing | 1 |
-| 1 | Built-in skills + baseline | 3 |
-| 2a | Instructions | 2 |
-| 2b | Skills (personal, built live) | 3 |
-| 2c | **Team skills: GitLab -> Unity Catalog** | 3 |
-| 2d | MCP: Genie Agent as a tool | 2 |
-| 2e | Memory + project memory | 2 |
-| 3 | Best practices | 1 |
-| 4 | Cost and usage | 2 |
-| 5 | Handoff | 1 |
+| # | Segment | Min | What you show live |
+|---|---|---|---|
+| 0 | Framing | 1 | "You know Genie Code. Today is about making it yours and keeping it governed." |
+| 1 | Built-in skills + baseline | 3 | EDA on `@samples.wanderbricks.bookings`, then "schedule as a daily Databricks Job". Save as the baseline |
+| 2a | Instructions | 2 | Same prompt with a workspace instructions file, side by side with the baseline |
+| 2b | Skills (workspace + UC) | 4 | `de-job-standards` auto-loads; `@data-quality-checks` explicitly; then GitLab -> Unity Gateway path |
+| 2c | Custom MCP | 2 | `mcp-data-standards` App: `get_naming_conventions` + `validate_table_name` |
+| 2d | Ontology + memory | 2 | One line on Genie Ontology; memory ("net revenue excludes cancelled bookings"); project memory (`AGENTS.md`) |
+| 3 | Best practices | 1 | One slide of 5 tips |
+| 4 | Cost and usage | 2 | Billing system-table query + budget screen |
+| 5 | Handoff | 1 | To Matteo/Fabian: CLI, ZeroOps, App Builder, Omnigent, roadmap |
+| | **Total** | **18** | 2 spare minutes for Q&A or a slow prompt |
 
 ---
 
 ## 0. Framing (1 min)
 
-**Show:** Catalog Explorer -> `samples.wanderbricks` (`reviews`, `properties`, `bookings`, `users`) and the empty `genie_code_workshop.asml_demo` schema.
+**Show:** Catalog Explorer -> `samples.wanderbricks` (`bookings`, `booking_updates`, `properties`, `destinations`) and the empty `genie_code_workshop.asml_demo` schema.
 
 **Say:** "You already know Genie Code. Today is about two things: making it *yours* (your standards, your context) and keeping it *governed* (cost, control). We'll run one prompt, then add one layer at a time and re-run it."
 
@@ -33,33 +33,32 @@ To keep to time: every prompt is **pre-run**. Keep a second tab with the finishe
 ## 1. Built-in skills + baseline (3 min)
 
 **Pre-check:**
-- No `/Users/<you>/.assistant_instructions.md`.
-- No demo skills in `/Users/<you>/.assistant/skills/`.
+- `/Workspace/.assistant_workspace_instructions.md` and `/Users/<you>/.assistant_instructions.md` are empty or absent.
+- The **UC skills are switched off** in Genie Code > Customizations, and the workspace skills `table-governance` / `pii-management` aren't in `/Workspace/.assistant/skills/` yet (pre-staged copies ready to drop in).
+- `mcp-data-standards` is **switched off** in Customizations > Connectors.
 - No saved memories about WanderBricks.
-- **The UC skills are switched off in Genie Code > Customizations.** The team skills from GitLab must stay invisible until 2c (see the reset steps).
-- No `WanderBricks Reviews` server in Genie Code **Settings > MCP Servers**.
 - Work from a notebook in `asml-workshop/demo/`.
 
 **Prompt 1a (agent mode, new chat):**
 
-> @samples.wanderbricks.reviews profile this table, find properties whose average rating is dropping month over month, and show the distribution of ratings.
+> @samples.wanderbricks.bookings profile this table, show the distribution of booking status, and trend total_amount per month.
 
 **Point out:** it explores UC metadata itself (built-in EDA / Unity Catalog exploration skills), samples the data and builds a chart.
 
 **Prompt 1b:**
 
-> Turn this into a notebook that writes a daily property health table, and schedule it as a Databricks Job that runs daily.
+> Turn this into a notebook that writes a daily booking revenue table, and schedule it as a Databricks Job that runs daily.
 
 **Point out:** the data engineering + jobs skills, the way ASML actually works.
 
-**Save** the notebook as `demo/baseline_property_health` and screenshot the job settings. **This is the baseline.**
+**Save** the notebook as `demo/baseline_booking_revenue` and screenshot the job settings. **This is the baseline.**
 
 What the baseline usually lacks (check during the pre-run and keep only what you actually saw):
 
 * [ ] Table naming convention (`gold_` prefix, snake_case)
 * [ ] Table and column COMMENTs, TBLPROPERTIES
 * [ ] Audit columns (`audit_timestamp`, `source_system`)
-* [ ] Soft-deleted reviews (`is_deleted = true`) excluded
+* [ ] Cancelled bookings (`status = 'cancelled'`) excluded from revenue
 * [ ] Job: failure notifications, timeout, retries, tags, max concurrent runs = 1
 
 **One sentence:** "Pipelines/SDP, Lakeflow Designer, dashboards and MLflow also ship as built-in skills. We stay on Jobs because that's how you build."
@@ -70,138 +69,110 @@ What the baseline usually lacks (check during the pre-run and keep only what you
 
 **Show:** the two files side by side:
 
-* User: `/Users/<you>/.assistant_instructions.md`
-* Workspace: `/Workspace/.assistant_workspace_instructions.md` (admins only; takes priority over user instructions)
+* Workspace: `/Workspace/.assistant_workspace_instructions.md` (admins only; applies to everyone and takes priority over user instructions)
+* User: `/Users/<you>/.assistant_instructions.md` (personal additions)
 
-**Do:** paste [`instructions/user_instructions_after.md`](instructions/user_instructions_after.md) into the user file (pre-staged; just open it). Open [`workspace_instructions_example.md`](instructions/workspace_instructions_example.md) as "this is what your platform team would own".
+**Do:** paste [`instructions/workspace_instructions_example.md`](instructions/workspace_instructions_example.md) into the workspace file (pre-staged; just open it). Open [`user_instructions_after.md`](instructions/user_instructions_after.md) as "and this is what each engineer can add on top".
 
-**New chat, re-run Prompt 1b** (with 1a's context, or say "Build a notebook from @samples.wanderbricks.reviews that writes a daily property health table and schedule it as a daily Databricks Job").
+**New chat, re-run Prompt 1b** (or say "Build a notebook from @samples.wanderbricks.bookings that writes a daily booking revenue table and schedule it as a daily Databricks Job").
 
-**Side-by-side with baseline. Point out:** PySpark, `gold_property_health_daily` naming, UC comments, Job not SDP, serverless.
+**Side-by-side with baseline. Point out:** PySpark, `gold_booking_revenue_daily` naming, UC comments, `audit_timestamp` / `source_system` last, Job not SDP, serverless.
 
-**Say:** "Instructions are always on: short global rules. They're not the place for a 3-page standard. That's what skills are for."
+**Say:** "Instructions are always on: short global rules your platform team owns. They're not the place for a 3-page standard. That's what skills are for."
 
 *(handout)* `AGENTS.md` / `CLAUDE.md` are also picked up automatically, which is useful for teams already on Claude or Copilot.
 
 ---
 
-## 2b. Skills: personal, built live (3 min)
-
-**Build live** (paste from pre-staged [`skills/job-standards/SKILL.md`](skills/job-standards/SKILL.md)):
-
-1. Create `/Users/<you>/.assistant/skills/job-standards/SKILL.md`. Walk through the anatomy: frontmatter `name` + `description` (the description is what triggers auto-load), rules, an example, edge cases.
-2. Add `scripts/check_table_standards.py`: "skills can ship code, not just prose."
-3. Also copy `table-governance/` and `pii-management/`: "these two come straight from the public genie-code-skills-demo repo, adapted from SDP to Jobs."
-
-**New chat** (gotcha: skills load at chat start, so always start a new chat after editing one).
-
-**Prompt 2b-1 (auto-load):**
-
-> Build a daily Job that writes a gold table of guest satisfaction per property from samples.wanderbricks.reviews and properties.
-
-**Point out:** in the reasoning panel, `job-standards` + `table-governance` load **without being mentioned**; output has audit columns last, TBLPROPERTIES, idempotent write, job with notifications/timeout/retries/tags, and it runs the checker script.
-
-**Prompt 2b-2 (explicit):**
-
-> @pii-management @job-standards add a silver guest table from samples.wanderbricks.users to this job.
-
-**Point out:** `email` hashed, `name` dropped/masked, `contains_pii` properties.
-
-**Bridge to 2c:** "That's *my* skill, in *my* folder. Nice for prototyping, but 500 engineers won't each copy a folder. Your standards live in GitLab. So let's put GitLab in charge."
-
----
-
-## 2c. Team skills: GitLab -> Unity Catalog -> Genie Code (3 min)
-
-**The architecture (one slide, 20 s):**
-
-```
-GitLab repo (source of truth)  ──git fetch──▶  Databricks Job "skills-sync-uc"  ──▶  UC skills  ──▶  Genie Code
-merge request + CI validation                  (runs inside the workspace,           skills.data_services.*     (Unity Gateway
-                                               as a service principal)               GRANT = who can use it     skills preview)
-```
+## 2b. Skills: workspace + Unity Catalog (4 min)
 
 **Pre-stage (before the session):**
 - Preview **Unity Gateway skills in Genie** is on.
-- Job `skills-sync-uc` has run successfully, and the 4 skills exist in `skills.data_services`: `de-job-standards`, `uc-documentation`, `data-quality-checks`, `code-review-checklist`.
+- Job `skills-sync-uc` has run successfully, and the 4 team skills exist in `uaigw_fe.data_services`: `de-job-standards`, `uc-documentation`, `data-quality-checks`, `code-review-checklist`.
 - An **open merge request** in `dbx-group1/asml-demo` changes `skills/de-job-standards/SKILL.md`. It adds `timeout_seconds: 3600` and `max_concurrent_runs: 1` to the job settings, which are two of the gaps in the baseline. Its CI `validate_skills` check is green.
-- A pre-run tab of the Job run that shows `updated: skills.data_services.de-job-standards`.
+- Pre-run tabs: the Job run that shows `updated: uaigw_fe.data_services.de-job-standards`, and Prompt 2b-1 re-run after the merge.
 
-**Do first (10 s): retire the personal copy.** Delete `/Users/<you>/.assistant/skills/job-standards/`. Keep `table-governance/` and `pii-management/`.
-**Say:** "The team standard replaces my personal copy. There's no precedence order between skill sources, and Genie Code picks skills by relevance, so keep **one** source per standard. Our instructions already say: team skill when available, otherwise the personal one."
+**1. Anatomy (30 s).** GitLab -> `skills/de-job-standards/SKILL.md`: frontmatter `name` + `description` (the description is what triggers auto-load), steps, an example, edge cases, plus `references/naming-conventions.md`. "Skills are folders of Markdown, and they can ship scripts too."
 
-**Show (60 s): the governance path.**
-1. **GitLab:** the repo layout (`skills/<name>/SKILL.md`, `skills.yaml` maps each folder to a UC name). Then open the MR. The **`validate_skills` pipeline** checks names and frontmatter before anything can merge. **Merge it.**
-2. **Databricks:** **Jobs > skills-sync-uc > Run now**. While it runs: "This Job pulls from GitLab: the workspace fetches the repo, so nothing in GitLab needs a Databricks credential or network access into the workspace. It runs as a service principal, so a person's login never publishes the team standard." Switch to the pre-run tab: `updated: …de-job-standards`, and the other three skills `unchanged`.
-3. **Catalog Explorer > skills > data_services:** the 4 skills as Unity Catalog securables, with an owner, permissions, and a full audit trail.
+**2. Turn them on (20 s).**
+- Drop `table-governance/` and `pii-management/` into `/Workspace/.assistant/skills/`: "workspace skills, owned by the platform team".
+- Genie Code > **Customizations** > **Skills**: enable the Unity Catalog skills.
+- **Say:** "UC decides who *may* use a skill (a `READ VOLUME` grant); each engineer opts in. There's no precedence order between skill sources, so keep **one** source per standard."
 
-**Show (15 s): who *may* use them is a UC grant.** Catalog Explorer > `skills` > **Permissions**: `READ VOLUME` (plus `USE CATALOG` / `USE SCHEMA`) to a group, here `account users`. "Restrict a standard to one team by granting it to that team's group only."
-```sql
-GRANT USE CATALOG ON CATALOG skills TO `<group>`;
-GRANT USE SCHEMA  ON SCHEMA  skills.data_services TO `<group>`;
-GRANT READ VOLUME ON CATALOG skills TO `<group>`;   -- or per skill in Catalog Explorer > Permissions
+**3. New chat, Prompt 2b-1 (auto-load):**
+
+> Build a daily Job that writes a gold table of booking revenue per destination and property type from samples.wanderbricks.bookings and properties.
+
+**Point out:** in the reasoning panel, `de-job-standards` (UC) and `table-governance` (workspace) load **without being mentioned**. The output has tasks ingest -> transform -> dq_checks -> publish, retries, a failure notification, tags including `project`, `gold_booking_revenue_daily`, audit columns last.
+
+**4. Prompt 2b-2 (explicit):**
+
+> @data-quality-checks validate gold_booking_revenue_daily and add the checks as the dq_checks task of this job.
+
+**Point out:** one query per check from the skill's check catalog, a PASS/FAIL table, and blocking checks wired into the job.
+
+**5. The GitLab -> Unity Gateway path (90 s).**
 ```
+GitLab repo (source of truth)  ──git fetch──▶  Databricks Job "skills-sync-uc"  ──▶  UC skills  ──▶  Genie Code
+merge request + CI validation                  (runs inside the workspace,           uaigw_fe.data_services.*   (Unity Gateway
+                                               as a service principal)               GRANT = who can use it     skills preview)
+```
+1. **GitLab:** open the MR. The **`validate_skills` pipeline** checks names and frontmatter before anything can merge. **Merge it.**
+2. **Databricks:** **Jobs > skills-sync-uc > Run now**. While it runs: "This Job pulls from GitLab: the workspace fetches the repo, so nothing in GitLab needs a Databricks credential or network access into the workspace. It runs as a service principal, so a person's login never publishes the team standard." Switch to the pre-run tab: `updated: …de-job-standards`, the other three `unchanged`.
+3. **Catalog Explorer > uaigw_fe > data_services:** the skills as Unity Catalog securables, with an owner, permissions, and an audit trail.
+4. **Pre-run tab of Prompt 2b-1 after the merge:** the job now has `timeout_seconds: 3600` and `max_concurrent_runs: 1`.
 
-**Do live (15 s): switch them on.** Genie Code > **Customizations** > **Skills**: enable the Unity Catalog skills (`de-job-standards`, `uc-documentation`, `data-quality-checks`, `code-review-checklist`). "UC decides who *may* use a skill; each engineer opts in."
+**Say:** "GitLab owns the content and the review process, and Unity Catalog owns who can use it. Your AI marketplace stays in GitLab; Databricks governs and serves it. The same skills work in Claude Code, Copilot or Cursor through Unity Gateway. UC skills in Genie Code are a **Beta preview** today; workspace skills are the GA alternative, fed from the same repo."
 
-**New chat, Prompt 2c:**
-
-> Build a daily Job that writes a gold table of guest satisfaction per property from samples.wanderbricks.reviews and properties.
-
-**Point out:**
-- `de-job-standards` (and `data-quality-checks` for the `dq_checks` task) load from **Unity Catalog** without being mentioned.
-- Same conventions as 2b: `gold_` table prefix, snake_case job name `wanderbricks_guest_satisfaction_daily`, `audit_timestamp` / `source_system` last, a `project: asml_demo` tag.
-- **New since the merge:** `timeout_seconds: 3600` and `max_concurrent_runs: 1`, which were **merged in GitLab 2 minutes ago**.
-
-**Say:** "Same SKILL.md format as the folder skill I just wrote. GitLab owns the content and the review process, and Unity Catalog owns who can use it. Your AI marketplace stays in GitLab; Databricks just governs and serves it. The same skills work in Claude Code, Copilot or Cursor through Unity Gateway."
-
-*(handout)* How it's wired: CI validates on every MR. The Job `skills-sync-uc` (Git source = GitLab, run as service principal, every 15 min or Run now) runs the publisher from `databricks/unity-gateway`. It creates, updates or skips each skill, and never deletes one. With ASML's self-hosted GitLab runners on an allowed network, CI can publish directly on merge instead (`publish_to_unity_catalog` job). Setup steps are in the repo README.
-
-**Status to say honestly:** "UC skills in Genie Code are a **Beta preview** today. Workspace skill folders are the generally available option."
+*(handout)* With ASML's self-hosted GitLab runners on an allowed network, CI can publish directly on merge instead (`publish_to_unity_catalog` job). Setup steps are in the skills repo README.
 
 ---
 
-## 2d. MCP: Genie Agent as a tool (2 min)
+## 2c. Custom MCP: Data Standards Gateway (2 min)
 
-**Bridge:** "Skills tell Genie Code *how* to work. MCP servers give it *tools* it can call: live systems and curated knowledge it doesn't hold itself."
+**Bridge:** "Skills put knowledge into the context. MCP servers give Genie Code **tools** it can call, including ones that compute or check things."
 
-**Pre-stage:** the Genie Agent **WanderBricks Reviews** (over `reviews`, `properties`, `bookings`) exists, and the demo group has access to it and its tables.
+**Pre-stage:** the App [`mcp-data-standards`](mcp-data-standards/README.md) is deployed and added in Customizations > Connectors (switched off until now).
 
-**Show (20 s):** Genie Code -> Customizations -> **Connectors**: the built-in connectors (Slack, GitHub, Atlassian, ...), then the custom/external MCP servers and the per-tool enable toggles. Admins control which servers are available; users pick from the approved ones.
+**Show (30 s):** Genie Code -> **Customizations** -> **Connectors**: the standard connectors (Gmail, Slack, GitHub, ...), then the custom `mcp-data-standards` with its 4 tools. Switch it on.
 
-**Do live: add the server (30 s):** Genie Code pane -> **Settings** -> **MCP Servers** -> **Add Server** -> **Genie Agent** -> select **WanderBricks Reviews** -> **Save**.
+**New chat, Prompt 2c-1:**
 
-**Say while the dialog is open:** "Four kinds of server live here: a **UC MCP Service** for external servers, **Unity Catalog functions** as SQL tools, **AI Search** indexes, and **Genie Agents**. The fifth option, an App-hosted custom MCP server, needs Databricks Apps, which you won't have until next year, so everything today runs without Apps."
+> What are the naming conventions for this project?
 
-**New chat, Prompt 2d:**
+**Point out:** Genie Code calls `get_naming_conventions` (visible as a tool call in the reasoning panel).
 
-> Ask the WanderBricks Reviews agent which property types had the most 1-star reviews last quarter, then use that to propose an alert threshold for the property health job.
+**Prompt 2c-2:**
 
-**Point out:** the agent call shows up in the reasoning panel as a **tool call**. The business answer comes from a curated Genie space your analysts already maintain, and Genie Code turns it into an engineering decision.
+> Validate the table names booking_revenue_gold and gold_booking_revenue_daily.
 
-**Say (one line, no demo):** "Need live GitLab access, like code search, open MRs or pipeline status? The same dialog takes GitLab's MCP server as a **UC MCP Service**: an `EXECUTE` grant decides who can use it, and per-user OAuth means each engineer only sees the repos they already have. For *standards*, use the skills from 2c; MCP is for live data and actions."
+**Point out:** `validate_table_name` returns **FAIL** for `booking_revenue_gold` ("the layer is a prefix, not a suffix. Did you mean `gold_booking_revenue`?") and **OK** for `gold_booking_revenue_daily`. A skill can only *describe* the rule; a tool *checks* it deterministically. The workspace instructions tell Genie Code to validate every new table name this way.
+
+**Say:** "In production, this App reads your standards from Unity Catalog. ASML has Apps disabled today; when you re-enable them, this is how you expose your GitLab AI marketplace, internal runbooks or any REST API as tools Genie Code can call. Admins decide which connectors exist; each user switches them on."
 
 ---
 
-## 2e. Memory + project memory (2 min)
+## 2d. Genie Ontology + memory (2 min)
 
-**Prompt (chat A):**
+**Genie Ontology (one line):** "For structured data access, the direction is **Genie Ontology**: an automated layer that replaces Genie Agents. You'll see it in the roadmap section."
 
-> Remember that WanderBricks reviews with is_deleted = true are soft-deleted and must always be excluded from any metric.
+**Memory, chat A:**
+
+> Remember that net revenue always excludes cancelled bookings (status = 'cancelled').
 
 **New chat B:**
 
-> Give me the average rating per property type for the last 90 days.
+> Give me net revenue per destination per month.
 
-**Point out:** the `is_deleted = false` filter appears without being told (476 soft-deleted rows in the sample data). Show the memory entry.
+**Point out:** the `status <> 'cancelled'` filter appears without being told (15,285 cancelled bookings, about 8.4M of `total_amount`, in the sample data). Show the memory entry.
 
-**Say:** "Instructions = rules **you** write, applied every time. Memory = context Genie Code **gathers** and recalls when relevant. Both are personal."
+**Say:** "Instructions = rules **you** write, applied every time. Memory = context Genie Code **gathers** and recalls when relevant. Memory is **per user**, not shared."
 
 **Project memory (team-wide):** open [`project/AGENTS.md`](project/AGENTS.md) + [`project/docs/project_context.md`](project/docs/project_context.md). Open a notebook inside `project/` and ask:
 
-> What's the SLA and owner for the property health job, and which tables does it write?
+> What's the SLA and owner for the booking revenue job, and which tables does it write?
 
-**Say:** "This lives in Git, so it's reviewed in merge requests, like the team skills in 2c, and shared with all 500 people you'll train. It fits your GitLab-first approach."
+**Say:** "This lives in Git, so it's reviewed in merge requests, like the team skills, and shared with all 500 people you'll train. It's the team-shared alternative to personal memory."
 
 ---
 
@@ -209,11 +180,11 @@ GRANT READ VOLUME ON CATALOG skills TO `<group>`;   -- or per skill in Catalog E
 
 Tie each tip back to a moment from the demo:
 
-1. **Be specific + `@` reference assets** (format, library, detail; seed schema with `SELECT * FROM ...`), as in Prompt 1a's `@samples.wanderbricks.reviews`.
+1. **Be specific + `@` reference assets** (format, library, detail; seed schema with `SELECT * FROM ...`), as in Prompt 1a's `@samples.wanderbricks.bookings`.
 2. **Document tables and columns in UC** (AI-generated comments). This is the biggest quality lever for machine-data tables, and the reason 1a found the right columns on its own.
 3. **One chat per task**, no marathon chats. We started a new chat every segment.
 4. **Effort level Low** for repeated simple tasks.
-5. **Standards as skills, live systems as MCP tools.** Keep team skills in GitLab, served from UC, with one source per standard (2c); connect tools like the Genie Agent (2d). Our prompts stayed one line.
+5. **Standards as skills, checks as tools.** Keep team skills in GitLab, served from UC (2b); expose deterministic checks as MCP tools (2c). Our prompts stayed one line.
 
 ---
 
@@ -229,15 +200,9 @@ Tie each tip back to a moment from the demo:
 
 ---
 
-## 4b. Genie Code CLI (optional, 2 min, only if ahead of time)
-
-Run Prompt 2b-1 in a terminal with the Genie Code CLI. Note that the CLI has its own skills and instructions today. The same UC skills from 2c can be loaded into CLI agents through Unity Gateway.
-
----
-
 ## 5. Handoff (1 min)
 
-"That's the customization stack: instructions, skills (personal and team-governed from GitLab), MCP tools, memory, plus the cost guardrails. Matteo and Fabian will now show where this goes next: the CLI, ZeroOps, App Builder and Omnigent."
+"That's the customization stack: instructions, skills (team-governed from GitLab via Unity Catalog), MCP tools, memory, plus the cost guardrails. Matteo and Fabian will now show where this goes next: the CLI, ZeroOps, App Builder, Omnigent and the roadmap, including Genie Ontology."
 
 ---
 
@@ -246,28 +211,27 @@ Run Prompt 2b-1 in a terminal with the Genie Code CLI. Note that the CLI has its
 | If... | Then... |
 | --- | --- |
 | A live run is slow | Switch to the pre-run tab and narrate the reasoning panel |
-| A skill doesn't auto-load | `@job-standards` explicitly; check you started a new chat |
-| UC skill doesn't load in 2c | Switched on in Genie Code > Customizations? New chat (hard-refresh the tab if the list looks stale)? Preview on? `READ VOLUME` for your group? Then `@de-job-standards` explicitly |
+| A skill doesn't auto-load | New chat? Switched on in Customizations (UC) or in `/Workspace/.assistant/skills/` (workspace)? Then `@de-job-standards` explicitly |
 | `skills-sync-uc` run is slow or fails | Show the pre-run successful run (`updated: …`); usual causes: the GitLab access token on the service principal expired, or the MR isn't merged yet |
-| Genie Agent not offered in Add Server, or the call fails | Check the demo user has access to the agent and its tables; otherwise show the pre-run tab and move on |
+| `mcp-data-standards` doesn't respond | Check the App is running (Compute > Apps) and the connector is switched on; otherwise show `server.py` and the pre-run tab |
 | Memory not recalled | Show the saved memory entry, then say "recall is relevance-based, unlike instructions" |
 
 ## Reset between rehearsals
 
 1. Run the reset section of `setup/00_setup_and_reset.sql`
-2. Empty `/Users/<you>/.assistant_instructions.md`
-3. Remove demo skill folders from `/Users/<you>/.assistant/skills/`
-4. Delete the WanderBricks memory (ask Genie Code to forget it)
-5. Delete the demo jobs created by Genie Code (Jobs UI, filter by tag `project:asml_demo`). **Not** `skills-sync-uc`.
-6. Remove **WanderBricks Reviews** from Genie Code Settings -> MCP Servers so the live "Add Server" step works again (keep the Genie Agent itself)
-7. **Switch the UC skills off again** in Genie Code > Customizations so the live step in 2c works again (keep the UC grants)
-   7b. **Re-create the personal `job-standards`** in `/Users/<you>/.assistant/skills/` for 2b (folder `job-standards`, file `SKILL.md`)
-8. **Re-stage the 2c MR:** revert the merged change on `main` (Revert button on the MR), **Run now** on `skills-sync-uc`, then open a fresh MR with the same change
+2. Empty `/Workspace/.assistant_workspace_instructions.md` and `/Users/<you>/.assistant_instructions.md`
+3. Remove `table-governance/` and `pii-management/` from `/Workspace/.assistant/skills/`
+4. Switch the UC skills off in Genie Code > Customizations > Skills (keep the UC grants)
+5. Switch `mcp-data-standards` off in Customizations > Connectors (keep the App running)
+6. Delete the WanderBricks memory (ask Genie Code to forget it)
+7. Delete the demo jobs created by Genie Code (Jobs UI, filter by tag `project:asml_demo`). **Not** `skills-sync-uc`
+8. **Re-stage the 2b MR:** revert the merged change on `main` (Revert button on the MR), **Run now** on `skills-sync-uc`, then open a fresh MR with the same change
 
 ## Pre-run checks (delete this section before sharing)
 
-- [ ] UC skills switched off in Customizations really disappears from "list your skills" in a new chat, and switching on brings them back
-- [ ] In a new chat after 2c, "list your skills" shows `de-job-standards` and no `job-standards` (the instructions now say: team skill when available, otherwise the personal one)
-- [ ] The 2b skill folder is `job-standards/SKILL.md` (hyphen, uppercase file name). `job_standards/skill.md` doesn't load
-- [ ] Time one `skills-sync-uc` run (serverless startup), and keep the pre-run tab ready
-- [ ] Your 2b `job-standards` user skill uses the same conventions as the UC `de-job-standards`: `gold_` prefix, snake_case job names, `audit_timestamp` / `source_system` last, `project` tag
+- [ ] `skills-sync-uc` exists in the hackathon workspace (target `uaigw_fe.data_services`) and has run successfully
+- [ ] UC skills switched off in Customizations really disappear from "list your skills" in a new chat, and come back when switched on
+- [ ] Apps are enabled in the demo workspace; `mcp-data-standards` deployed; the Connectors path (Add MCP server > Custom MCP server) matches the UI
+- [ ] Prompt 2b-1 doesn't already exclude cancelled bookings (otherwise the 2d memory moment is weaker); if it does, keep the memory demo but point at the saved entry
+- [ ] `de-job-standards` and `mcp-data-standards` give the same naming rules (`gold_` prefix). The skills repo is the source of truth
+- [ ] Pre-run outputs saved for every prompt; the old reviews-based notebooks in `demo/` and `dry-run/` replaced by booking-revenue ones

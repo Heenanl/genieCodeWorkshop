@@ -1,6 +1,6 @@
 # Data Services engineering standards (workspace instructions, example)
 
-> Show-only in the demo. A workspace admin saves this as `/Workspace/.assistant_workspace_instructions.md`.
+> Pasted live in segment 2a. A workspace admin saves this as `/Workspace/.assistant_workspace_instructions.md`.
 > Workspace instructions apply to every user and take priority over user instructions.
 > Adapted from `instructions/.assistant_workspace_instructions.md` in genie-code-skills-demo (SDP replaced by Jobs).
 
@@ -31,3 +31,7 @@ source per standard**; there is no precedence order between skill sources.
 3. `@data-quality-checks` (UC): before publishing a table or scheduling a job.
 4. `@pii-management`: tables with personal data.
 5. `@code-review-checklist` (UC): before a merge request, or when asked "is this production ready".
+
+## Tools
+- When the `mcp-data-standards` connector is enabled, always call `get_naming_conventions` before creating a table and `validate_table_name` before finalising the name.
+- For structured data questions, use Genie Ontology (direct prompting in Genie Code) rather than creating Genie Agents.

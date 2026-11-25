@@ -1,41 +1,46 @@
-# Project context: WanderBricks property health
+# Project context: WanderBricks booking revenue
 
 > Version-controlled project memory. Change it through merge requests.
 
 ## Purpose
 
-Daily health score per property from guest reviews and bookings, so operations can act on properties whose guest experience is dropping. (ASML analogy: machine health from sensor readings.)
+Trusted daily booking revenue per destination and property type, so commercial teams can act on destinations whose revenue is dropping. (ASML analogy: output KPI per machine type from production runs.)
 
 ## Owners and SLA
 
 | Item | Value |
 | --- | --- |
 | Owning team | data_services |
-| Job | `wanderbricks_property_health_daily` |
+| Job | `wanderbricks_booking_revenue_daily` |
 | Schedule | Daily 06:00 Europe/Amsterdam |
 | Freshness SLA | Gold tables ready by 07:00 Europe/Amsterdam |
-| On failure | Email the job owner; one automatic retry after 5 min |
+| On failure | Email the job owner; two automatic retries, 5 min apart |
 
 ## Tables
 
 | Table | Layer | Source | Notes |
 | --- | --- | --- | --- |
-| `silver_reviews` | silver | `samples.wanderbricks.reviews` | Non-deleted reviews; `comment` is PII (FREEFORM) |
+| `silver_bookings` | silver | `samples.wanderbricks.bookings`, `booking_updates` | Latest status per booking |
 | `silver_guests` | silver | `samples.wanderbricks.users` | `email` hashed, `name` dropped |
-| `gold_property_health_daily` | gold | `silver_reviews`, `samples.wanderbricks.bookings` | One row per property per day |
+| `gold_booking_revenue_daily` | gold | `silver_bookings`, `samples.wanderbricks.properties`, `destinations` | One row per day x destination x property type |
 
 ## Metric definitions
 
-- **Review scope (applies to every metric)**: reviews with `is_deleted = true` in `samples.wanderbricks.reviews` are soft-deleted and are always excluded. `review_id` is not unique (1,000 distinct values over 99,793 rows), so count review rows, not distinct `review_id`.
-- **avg_rating_30d**: average `rating` of non-deleted reviews created in the last 30 days.
-- **rating_trend**: `avg_rating_30d` minus the average rating for the previous 30 days.
-- **at_risk**: `rating_trend <= -0.5` AND at least 5 reviews in the last 30 days.
-- **booking_count_30d**: bookings with `status IN ('confirmed', 'completed')` and `check_in` in the last 30 days.
+- **Revenue scope (applies to every metric)**: cancelled bookings (`status = 'cancelled'`) are always excluded. In the sample data that's 15,285 of 72,247 bookings.
+- **net_revenue_amount**: sum of `total_amount` for non-cancelled bookings, by `check_in` date.
+- **booking_count**: number of non-cancelled bookings, by `check_in` date.
+- **avg_booking_value**: `net_revenue_amount / booking_count`.
 
 ## Decisions
 
 | Date | Decision | Why |
 | --- | --- | --- |
 | 2026-11-22 | Jobs, not SDP | Team standard |
-| 2026-11-22 | Exclude `is_deleted` reviews and cancelled bookings | They don't reflect guest experience |
+| 2026-11-24 | Exclude cancelled bookings from revenue | They never generate revenue |
+| 2026-11-24 | Use latest status from `booking_updates` | Bookings change after creation |
 | 2026-11-22 | Full overwrite of gold daily | Small data; simpler than MERGE |
+| 2026-11-24 | Genie Ontology for structured data access, not Genie Agents | Genie Agents are being phased out |
+
+## Known risks
+
+- Currency handling is out of scope for the demo.

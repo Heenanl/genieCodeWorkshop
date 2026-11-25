@@ -5,10 +5,9 @@
 CREATE SCHEMA IF NOT EXISTS genie_code_workshop.asml_dry_run COMMENT 'ASML Genie Code hackathon dry run. ';
 
 -- Sanity checks used in the talk track
-SELECT COUNT(*) AS reviews, SUM(CASE WHEN is_deleted THEN 1 ELSE 0 END) AS soft_deleted_reviews
-FROM samples.wanderbricks.reviews;
-
-SELECT status, COUNT(*) AS bookings FROM samples.wanderbricks.bookings GROUP BY status ORDER BY bookings DESC;
+-- Memory demo (2d): cancelled bookings are excluded from net revenue (15,285 rows, ~8.4M total_amount)
+SELECT status, COUNT(*) AS bookings, ROUND(SUM(total_amount)) AS total_amount
+FROM samples.wanderbricks.bookings GROUP BY status ORDER BY bookings DESC;
 
 -- ===== RESET (between rehearsals) =====
 -- Drops everything Genie Code created in the demo schema, then recreates the empty schema.

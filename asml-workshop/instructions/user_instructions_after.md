@@ -1,6 +1,6 @@
 # Data engineering rules (user instructions)
 
-Copy into `/Users/<you>/.assistant_instructions.md` for segment 2a. Keep it short: these rules apply to every response.
+Personal add-on to the workspace instructions (shown in segment 2a; copy into `/Users/<you>/.assistant_instructions.md`). Keep it short: these rules apply to every response.
 
 ## Build style
 - Write PySpark in notebooks. Use SQL only for DDL (COMMENT, TBLPROPERTIES, tags).
@@ -9,7 +9,7 @@ Copy into `/Users/<you>/.assistant_instructions.md` for segment 2a. Keep it shor
 
 ## Naming
 - Tables: `lowercase_snake_case` with a layer prefix `bronze_`, `silver_`, `gold_`; daily snapshots end in `_daily`.
-- Jobs: `<domain>_<purpose>_daily`, for example `wanderbricks_property_health_daily`.
+- Jobs: `<domain>_<purpose>_daily`, for example `wanderbricks_booking_revenue_daily`.
 - Default target: catalog `genie_code_workshop`, schema `asml_demo`.
 
 ## Documentation
@@ -17,5 +17,5 @@ Copy into `/Users/<you>/.assistant_instructions.md` for segment 2a. Keep it shor
 
 ## Skills
 - Tables: apply `table-governance`; add `pii-management` for personal data.
-- Notebooks and jobs: apply the team skill `de-job-standards` (Unity Catalog, published from GitLab) when it's available; otherwise my personal `job-standards`. Never apply both.
+- Notebooks and jobs: apply the team skill `de-job-standards` (Unity Catalog, published from GitLab). If it isn't available, use `job-standards`. Never apply both.
 - Before scheduling a job, run `data-quality-checks` when it's available.
