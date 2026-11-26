@@ -9,7 +9,7 @@ Before making changes, read `docs/project_context.md` (owners, SLAs, tables, met
 ## Always
 
 - Build with PySpark notebooks + Lakeflow Jobs, not SDP. Prefer SQL for simple transformations.
-- Target `genie_code_workshop.asml_demo`; source `samples.wanderbricks` (read-only).
+- Target `uaigw_fe.asml_demo`; source `samples.wanderbricks` (read-only).
 - Net revenue excludes cancelled bookings (`status = 'cancelled'`); use the latest status from `booking_updates`.
 - Tables: `bronze_` / `silver_` / `gold_` prefixes, `audit_timestamp` + `source_system` last. Every new table gets table and column comments.
 - For naming conventions and data-quality rules, call the `mcp-data-standards` MCP tools if connected; otherwise follow the `de-job-standards` and `data-quality-checks` skills. Apply `table-governance`; `pii-management` for `users` / `hosts`.

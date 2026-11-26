@@ -33,7 +33,7 @@ NAMING = """
 
 - Booleans start with is_ / has_. Timestamps end with _timestamp, dates with _date.
 - Audit columns go last in every table: audit_timestamp (load time, UTC), source_system.
-- Development output goes to genie_code_workshop.asml_demo.
+- Development output goes to uaigw_fe.asml_demo.
 """
 
 DQ_CHECKS = """
@@ -61,7 +61,7 @@ Trusted daily booking revenue per destination and property type.
 ## Decisions
 - Source data: samples.wanderbricks (bookings, booking_updates, payments, properties, destinations).
 - Reporting grain: day, by destination and property type.
-- Output: genie_code_workshop.asml_demo.gold_booking_revenue_daily,
+- Output: uaigw_fe.asml_demo.gold_booking_revenue_daily,
   job wanderbricks_booking_revenue_daily (PySpark notebooks + Lakeflow Jobs, not SDP).
 - All gold tables must pass the data-quality checks before a job is scheduled.
 

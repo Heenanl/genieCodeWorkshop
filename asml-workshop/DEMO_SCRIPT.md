@@ -1,7 +1,7 @@
 # Demo Script: ASML Genie Code Hackathon (18 min + 2 min buffer)
 
 One storyline: **WanderBricks bookings -> daily booking-revenue Job**, on `samples.wanderbricks`.
-Output lands in `genie_code_workshop.asml_demo` (run `setup/00_setup_and_reset.sql` first).
+Output lands in `uaigw_fe.asml_demo` (run `setup/00_setup_and_reset.sql` first).
 
 ASML mapping to say out loud once: *property = machine, booking = production run, booking revenue = output KPI, cancelled booking = aborted run.*
 
@@ -24,7 +24,7 @@ To keep to time: every prompt is **pre-run**. Keep a second tab with the finishe
 
 ## 0. Framing (1 min)
 
-**Show:** Catalog Explorer -> `samples.wanderbricks` (`bookings`, `booking_updates`, `properties`, `destinations`) and the empty `genie_code_workshop.asml_demo` schema.
+**Show:** Catalog Explorer -> `samples.wanderbricks` (`bookings`, `booking_updates`, `properties`, `destinations`) and the empty `uaigw_fe.asml_demo` schema.
 
 **Say:** "You already know Genie Code. Today is about two things: making it *yours* (your standards, your context) and keeping it *governed* (cost, control). We'll run one prompt, then add one layer at a time and re-run it."
 
@@ -88,9 +88,9 @@ What the baseline usually lacks (check during the pre-run and keep only what you
 
 **Pre-stage (before the session):**
 - Preview **Unity Gateway skills in Genie** is on.
-- Job `skills-sync-uc` has run successfully, and the 4 team skills exist in `skills.data_services`: `de-job-standards`, `uc-documentation`, `data-quality-checks`, `code-review-checklist`.
+- Job `skills-sync-uc` has run successfully, and the 4 team skills exist in `uaigw_fe.data_services`: `de-job-standards`, `uc-documentation`, `data-quality-checks`, `code-review-checklist`.
 - An **open merge request** in `dbx-group1/asml-demo` changes `skills/de-job-standards/SKILL.md`. It adds `timeout_seconds: 3600` and `max_concurrent_runs: 1` to the job settings, which are two of the gaps in the baseline. Its CI `validate_skills` check is green.
-- Pre-run tabs: the Job run that shows `updated: skills.data_services.de-job-standards`, and Prompt 2b-1 re-run after the merge.
+- Pre-run tabs: the Job run that shows `updated: uaigw_fe.data_services.de-job-standards`, and Prompt 2b-1 re-run after the merge.
 
 **1. Anatomy (30 s).** GitLab -> `skills/de-job-standards/SKILL.md`: frontmatter `name` + `description` (the description is what triggers auto-load), steps, an example, edge cases, plus `references/naming-conventions.md`. "Skills are folders of Markdown, and they can ship scripts too."
 
@@ -114,12 +114,12 @@ What the baseline usually lacks (check during the pre-run and keep only what you
 **5. The GitLab -> Unity Gateway path (90 s).**
 ```
 GitLab repo (source of truth)  ──git fetch──▶  Databricks Job "skills-sync-uc"  ──▶  UC skills  ──▶  Genie Code
-merge request + CI validation                  (runs inside the workspace,           skills.data_services.*   (Unity Gateway
+merge request + CI validation                  (runs inside the workspace,           uaigw_fe.data_services.*   (Unity Gateway
                                                as a service principal)               GRANT = who can use it     skills preview)
 ```
 1. **GitLab:** open the MR. The **`validate_skills` pipeline** checks names and frontmatter before anything can merge. **Merge it.**
 2. **Databricks:** **Jobs > skills-sync-uc > Run now**. While it runs: "This Job pulls from GitLab: the workspace fetches the repo, so nothing in GitLab needs a Databricks credential or network access into the workspace. It runs as a service principal, so a person's login never publishes the team standard." Switch to the pre-run tab: `updated: …de-job-standards`, the other three `unchanged`.
-3. **Catalog Explorer > skills > data_services:** the skills as Unity Catalog securables, with an owner, permissions, and an audit trail.
+3. **Catalog Explorer > uaigw_fe > data_services:** the skills as Unity Catalog securables, with an owner, permissions, and an audit trail.
 4. **Pre-run tab of Prompt 2b-1 after the merge:** the job now has `timeout_seconds: 3600` and `max_concurrent_runs: 1`.
 
 **Say:** "GitLab owns the content and the review process, and Unity Catalog owns who can use it. Your AI marketplace stays in GitLab; Databricks governs and serves it. The same skills work in Claude Code, Copilot or Cursor through Unity Gateway. UC skills in Genie Code are a **Beta preview** today; workspace skills are the GA alternative, fed from the same repo."
@@ -229,9 +229,9 @@ Tie each tip back to a moment from the demo:
 
 ## Pre-run checks (delete this section before sharing)
 
-- [ ] `skills-sync-uc` exists in the hackathon workspace (target `skills.data_services`) and has run successfully
+- [x] `skills-sync-uc` exists in the hackathon workspace (target `uaigw_fe.data_services`) and has run successfully. Its schedule stays **paused** so the live **Run now** in 2b is the one that publishes the MR
 - [ ] UC skills switched off in Customizations really disappear from "list your skills" in a new chat, and come back when switched on
-- [x] Apps are enabled in the demo workspace (asml-demo); `mcp-data-standards` is deployed at `https://mcp-data-standards-7405607225336205.5.azure.databricksapps.com/mcp` and answers all 4 tools
+- [x] Apps are enabled in the demo workspace (uaigw-fe, https://fevm-uaigw-stable-fe.cloud.databricks.com); `mcp-data-standards` is deployed at `https://mcp-data-standards-7474646434331552.aws.databricksapps.com/mcp` and answers all 4 tools
 - [ ] The Connectors path (Add MCP server > Custom MCP server) matches the UI
 - [ ] Prompt 2b-1 doesn't already exclude cancelled bookings (otherwise the 2d memory moment is weaker); if it does, keep the memory demo but point at the saved entry
 - [ ] `de-job-standards` and `mcp-data-standards` give the same naming rules (`gold_` prefix). The skills repo is the source of truth

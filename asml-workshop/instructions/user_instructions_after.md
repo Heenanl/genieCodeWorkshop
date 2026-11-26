@@ -10,7 +10,7 @@ Personal add-on to the workspace instructions (shown in segment 2a; copy into `/
 ## Naming
 - Tables: `lowercase_snake_case` with a layer prefix `bronze_`, `silver_`, `gold_`; daily snapshots end in `_daily`.
 - Jobs: `<domain>_<purpose>_daily`, for example `wanderbricks_booking_revenue_daily`.
-- Default target: catalog `genie_code_workshop`, schema `asml_demo`.
+- Default target: catalog `uaigw_fe`, schema `asml_demo`.
 
 ## Documentation
 - Every table gets a table COMMENT and column COMMENTs for keys, derived columns and PII columns in Unity Catalog.

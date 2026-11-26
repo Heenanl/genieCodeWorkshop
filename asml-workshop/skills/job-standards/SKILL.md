@@ -10,7 +10,7 @@ For teams that build with **Jobs, not SDP**. Apply together with `table-governan
 ## Steps
 
 1. **Read before writing.** Inspect source tables in Unity Catalog (columns, comments) before writing transformations.
-2. **Write PySpark** in a notebook with widgets `catalog` and `schema` (defaults `genie_code_workshop` / `asml_demo`). No hard-coded catalog names in logic.
+2. **Write PySpark** in a notebook with widgets `catalog` and `schema` (defaults `uaigw_fe` / `asml_demo`). No hard-coded catalog names in logic.
 3. **Name tables** `lowercase_snake_case` with a layer prefix: `bronze_`, `silver_`, `gold_`. Daily snapshots end in `_daily`.
 4. **Order columns:** identifiers -> dimensions -> measures -> derived -> `data_quality_flag` (silver) -> **`audit_timestamp`, `source_system` LAST**.
 5. **Write idempotently.** Full refresh: `mode("overwrite")` with `overwriteSchema`. Incremental: `MERGE` on the business key, or `replaceWhere` on the date partition for daily snapshots. Never plain `append` for a daily job (re-runs would duplicate rows).

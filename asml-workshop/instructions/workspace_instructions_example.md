@@ -21,7 +21,7 @@
 
 ## Skills
 Team standards live in the GitLab skills repo, are reviewed in merge requests, published to
-Unity Catalog (`skills.data_services`) and enabled in Genie Code > Customizations. Keep **one
+Unity Catalog (`uaigw_fe.data_services`) and enabled in Genie Code > Customizations. Keep **one
 source per standard**; there is no precedence order between skill sources.
 
 1. `@table-governance`: apply first, to every table. It implements the documentation policy

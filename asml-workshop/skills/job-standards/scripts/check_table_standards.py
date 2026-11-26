@@ -3,7 +3,7 @@
 Usage in a notebook (Spark session available):
 
     %run ./check_table_standards   # or paste this function into a cell
-    check_table_standards("genie_code_workshop.asml_demo.gold_property_health_daily")
+    check_table_standards("uaigw_fe.asml_demo.gold_property_health_daily")
 
 Returns a list of failure messages (empty list = pass) and prints a summary.
 Only reads metadata; never modifies the table.
