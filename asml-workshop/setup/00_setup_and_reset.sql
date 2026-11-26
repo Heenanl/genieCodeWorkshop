@@ -3,6 +3,8 @@
 
 -- ===== SETUP (run once) =====
 CREATE SCHEMA IF NOT EXISTS genie_code_workshop.asml_dry_run COMMENT 'ASML Genie Code hackathon dry run. ';
+CREATE SCHEMA IF NOT EXISTS genie_code_workshop.asml_demo
+  COMMENT 'ASML Genie Code hackathon demo output (30 Nov 2026). Safe to drop.';
 
 -- Sanity checks used in the talk track
 -- Memory demo (2d): cancelled bookings are excluded from net revenue (15,285 rows, ~8.4M total_amount)

@@ -92,7 +92,7 @@ The demo mentions this in segment 2d and the roadmap section covers it in detail
 * [ ] Baseline notebook + job definition saved as `demo/baseline_*` (don't delete it; it's the comparison)
 * [ ] `table-governance` + `pii-management` tested as workspace skills (auto-load and `@` mention), then removed again before the run
 * [ ] `mcp-data-standards` App deployed and added under Customizations > Connectors; both 2c prompts return tool calls (then switched off)
-* [ ] UC skills: `skills-sync-uc` Job ran successfully, 4 skills in `uaigw_fe.data_services`, visible in Genie Code after enabling them in Customizations (then switched off again)
+* [ ] UC skills: `skills-sync-uc` Job ran successfully, 4 skills in `skills.data_services`, visible in Genie Code after enabling them in Customizations (then switched off again)
 * [ ] 2c merge request staged in `dbx-group1/asml-demo` (adds `timeout_seconds` + `max_concurrent_runs` to `de-job-standards`), CI green, pre-run tab of the `updated` Job run
 * [ ] Memory scenario rehearsed across two chats; delete the memory afterwards so the live run starts clean
 * [ ] `cost/genie_code_usage.sql` runs, Genie Code events dashboard imported (handout), budget screen screenshot
