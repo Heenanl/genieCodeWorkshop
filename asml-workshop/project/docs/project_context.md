@@ -40,6 +40,8 @@ Trusted daily booking revenue per destination and property type, so commercial t
 | 2026-11-24 | Use latest status from `booking_updates` | Bookings change after creation |
 | 2026-11-22 | Full overwrite of gold daily | Small data; simpler than MERGE |
 | 2026-11-24 | Genie Ontology for structured data access, not Genie Agents | Genie Agents are being phased out |
+| 2026-11-24 | Target `uaigw_fe.asml_demo` instead of `genie_code_workshop.asml_demo` | `genie_code_workshop` doesn't exist and we lack CREATE CATALOG; chosen by the user |
+| 2026-11-24 | UC tags: `data_classification = pii` on silver only; no `pii` tag | Governed tag policies only allow domain (finance, sales, supply_chain, quality, hr, operations), pii (ssn, address), data_classification (u-nnpi, cui, pii). PII is still labelled via TBLPROPERTIES and comments |
 
 ## Known risks
 
